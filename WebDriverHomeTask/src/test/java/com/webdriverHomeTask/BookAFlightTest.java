@@ -1,7 +1,5 @@
 package com.webdriverHomeTask;
 
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
@@ -28,8 +26,6 @@ public class BookAFlightTest {
 	
 	private WebElement originTextBox;
 	private WebElement destinationTextBox;
-	private WebElement leavingOnDate;
-	private WebElement returningOnDate;
 	private WebElement NoOfChildren;
 	
 	
