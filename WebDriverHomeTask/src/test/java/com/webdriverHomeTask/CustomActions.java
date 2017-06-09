@@ -39,10 +39,10 @@ public class CustomActions {
 		} else {
 			Assert.fail("please provide proper dateType"); 
 		}
-		csactions.Yearobject = Runner.driver.findElement(By.xpath(sdate+"//div/span[@class='ui-datepicker-year']"));
-		csactions.monthobject = Runner.driver.findElement(By.xpath(sdate+"//div/span[@class='ui-datepicker-month']"));
-		csactions.dayobject = Runner.driver.findElement(By.xpath(sdate+"//table[@class='ui-datepicker-calendar']//td/a[contains(text(),'"+day+"')]"));
-		WebElement nextArrow = Runner.driver.findElement(By.xpath(sdate+"//div//span[contains(text(),'Next')]"));
+		csactions.Yearobject = Runner.getDriver().findElement(By.xpath(sdate+"//div/span[@class='ui-datepicker-year']"));
+		csactions.monthobject = Runner.getDriver().findElement(By.xpath(sdate+"//div/span[@class='ui-datepicker-month']"));
+		csactions.dayobject = Runner.getDriver().findElement(By.xpath(sdate+"//table[@class='ui-datepicker-calendar']//td/a[contains(text(),'"+day+"')]"));
+		WebElement nextArrow = Runner.getDriver().findElement(By.xpath(sdate+"//div//span[contains(text(),'Next')]"));
 
 		int currentyear = Integer.parseInt(csactions.Yearobject.getText());
 		String currentMonth = csactions.monthobject.getText();
@@ -55,10 +55,10 @@ public class CustomActions {
 					break;
 				} else{
 					nextArrow.click();
-					nextArrow = Runner.driver.findElement(By.xpath(sdate+"//div//span[contains(text(),'Next')]"));
-					csactions.monthobject = Runner.driver.findElement(By.xpath(sdate+"//div/span[@class='ui-datepicker-month']"));
+					nextArrow = Runner.getDriver().findElement(By.xpath(sdate+"//div//span[contains(text(),'Next')]"));
+					csactions.monthobject = Runner.getDriver().findElement(By.xpath(sdate+"//div/span[@class='ui-datepicker-month']"));
 					currentMonth=csactions.monthobject.getText();
-					csactions.dayobject = Runner.driver.findElement(By.xpath(sdate+"//table[@class='ui-datepicker-calendar']//td/a[contains(text(),'"+day+"')]"));
+					csactions.dayobject = Runner.getDriver().findElement(By.xpath(sdate+"//table[@class='ui-datepicker-calendar']//td/a[contains(text(),'"+day+"')]"));
 				}
 			} else{
 				nextArrow.click();
