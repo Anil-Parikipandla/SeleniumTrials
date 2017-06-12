@@ -6,65 +6,52 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
-import org.testng.Assert;
 
 public class CustomActions {
 
-	private WebElement Yearobject;
 	private WebElement monthobject;
 	private WebElement dayobject;
-
 	
-	public static void keyPress(WebDriver driver ){
+
+
+	public static void keyPress(WebDriver driver, Keys key ){
 		Actions act = new Actions(driver);
-		act.sendKeys(Keys.TAB);
+		Action kepress = act.sendKeys(Keys.ENTER).build();
+				
 	}
 
-	public static void pickDate(String dateType, String date){
-		
-		int day = Integer.parseInt(date.substring(0,2));
-		int mon = Integer.parseInt(date.substring(3,5));
-		String month = (new DateFormatSymbols().getMonths()[mon-1]).toString();
-		int year = Integer.parseInt(date.substring(6));
-		
-		String fromDate = "//div[@id='depDateGroup']";
-		String toDate = "//div[@id='return-date-div']";
-		String sdate = "";
-		CustomActions csactions = new CustomActions();
-		if(dateType.equalsIgnoreCase("DepartureDate")){
-			sdate = fromDate;
-		}else if(dateType.equalsIgnoreCase("ReturnDate")){
-			sdate = toDate;
-		} else {
-			Assert.fail("please provide proper dateType"); 
-		}
-		csactions.Yearobject = Runner.getDriver().findElement(By.xpath(sdate+"//div/span[@class='ui-datepicker-year']"));
-		csactions.monthobject = Runner.getDriver().findElement(By.xpath(sdate+"//div/span[@class='ui-datepicker-month']"));
-		csactions.dayobject = Runner.getDriver().findElement(By.xpath(sdate+"//table[@class='ui-datepicker-calendar']//td/a[contains(text(),'"+day+"')]"));
-		WebElement nextArrow = Runner.getDriver().findElement(By.xpath(sdate+"//div//span[contains(text(),'Next')]"));
+	public static void pickDate(WebDriver driver, String date) throws InterruptedException{
 
-		int currentyear = Integer.parseInt(csactions.Yearobject.getText());
+		date = (date.charAt(0)=='0')?(date.substring(1)):date;
+		String[] words = date.split("\\.");
+
+		int day = Integer.parseInt(words[0]);
+		int mon = Integer.parseInt(words[1]);
+		String month = (new DateFormatSymbols().getMonths()[mon-1]).toString() +" " +words[2];
+
+		CustomActions csactions = new CustomActions();
+		csactions.monthobject = Runner.getDriver().findElement(By.xpath("//div[@id='calendarLeft']//span[@id='monthLeft']"));
+		csactions.dayobject = Runner.getDriver().findElement(By.xpath("//table[@class='ui-datepicker-calendar']//tbody[@id='dataLeft']//td/a[contains(text(),'"+day+"')]"));
+		WebElement nextArrow = Runner.getDriver().findElement(By.xpath("//a[@id='nextMonth']"));
+
 		String currentMonth = csactions.monthobject.getText();
 
-		for(int i =0;i<=12;i++){
-			if(currentyear==year){
-				if(currentMonth.equalsIgnoreCase(month)){
-					csactions.dayobject.click();
-					System.out.println("selected Date is:"+day+"/"+currentMonth+"/"+currentyear );
-					break;
-				} else{
-					nextArrow.click();
-					nextArrow = Runner.getDriver().findElement(By.xpath(sdate+"//div//span[contains(text(),'Next')]"));
-					csactions.monthobject = Runner.getDriver().findElement(By.xpath(sdate+"//div/span[@class='ui-datepicker-month']"));
-					currentMonth=csactions.monthobject.getText();
-					csactions.dayobject = Runner.getDriver().findElement(By.xpath(sdate+"//table[@class='ui-datepicker-calendar']//td/a[contains(text(),'"+day+"')]"));
-				}
+		for(int i =0;i<=10;i++){
+			if(currentMonth.equalsIgnoreCase(month)){
+				CustomWaits.waitforStaleElement(driver, csactions.dayobject);
+				csactions.dayobject.click();
+				System.out.println("selected Date is:"+day+"/"+currentMonth+"/" );
+				break;
 			} else{
+				CustomWaits.waitforStaleElement(driver, nextArrow);
 				nextArrow.click();
-				currentyear = Integer.parseInt(csactions.Yearobject.getText());
+				nextArrow = Runner.getDriver().findElement(By.xpath("//a[@id='nextMonth']"));
+				csactions.monthobject = Runner.getDriver().findElement(By.xpath("//div[@id='calendarLeft']//span[@id='monthLeft']"));
+				currentMonth=csactions.monthobject.getText();
+				csactions.dayobject = Runner.getDriver().findElement(By.xpath("//table[@class='ui-datepicker-calendar']//tbody[@id='dataLeft']//td/a[contains(text(),'"+day+"')]"));
 			}
-		}
-
+		} 
 	}
 }

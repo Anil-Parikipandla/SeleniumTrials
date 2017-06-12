@@ -1,83 +1,111 @@
 package com.webdriverHomeTask;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import com.webdriverHomeTask.CustomActions;
+import com.webdriverHomeTask.CustomWaits;
+import com.webdriverHomeTask.Runner;
 
 
 public class BookAFlightTest {
-	private String APPLICATION_URL = "https://www.airbaltic.com/en-ZZ/index";
-	private String expectedPageTitle = "Official airBaltic Website | Cheap Flights to the Baltics, Russia, Europe";
-	private String expectedFromCityName = "St Petersburg"; 
-	private String expectedFromCountryName = "Russian Federation"; 
-	private String expectedToCityName = "Stockholm"; 
-	private String expectedToCountryName = "Sweden"; 
-	private String departureDate = "12.06.2017";
-	private String returnDate = "13.07.2017";
+	
+	private WebDriver driver;
+	private ObjectRepository OR;
+	private String APPLICATION_URL = "https://www.emirates.com/uk/english/";
+	private String expectedPageTitle = "Emirates flights – Book a flight, browse our flight offers and explore the Emirates Experience";
+	private String expectedFromCityName = "St Petersburg (LED)"; 
+	private String expectedToCityName = "Dubai (DXB)"; 
+	private String departureDate = "14.07.2017";
+	private String returnDate = "15.07.2017";
 	private String actualNoOfAdults = "";
-	private String expectedNoOfAdults = "1 adult";
+	private String expectedNoOfAdults = "1";
 	private String actualNoOfChildren = "";
-	private String expectedNoOfChildren = "1 child";
+	private String expectedNoOfChildren = "1";
 	private String searchResultsPageHeader = "";
 	private String expectedsearchResultsPageHeader = "Flights and ticket types";
 	
-	
-	private WebElement originTextBox;
-	private WebElement destinationTextBox;
-	private WebElement NoOfChildren;
-	
+
+/*	WebElement bookAFlightlink =  driver.findElement(OR.lBookAFlight);
+	WebElement depatureAirportTextbox = driver.findElement(OR.lDepartureAirport);
+	WebElement arrivalAirportTextbox = driver.findElement(OR.lArrivalAirport);
+	WebElement adultsdropdown = driver.findElement(OR.lAdults);
+	WebElement addChildren = driver.findElement(OR.lAddchildren);
+	WebElement childrendropdown = driver.findElement(OR.lChildren);
+	WebElement NoOfChildren = driver.findElement(OR.lNoOfChildren);*/
+
 	
 	@BeforeClass
 	public void OpenBrowser(){
-		Runner.getDriver();
+		driver = Runner.getDriver();
+		OR = new ObjectRepository();
 	}
 	
 	@Test
 	public void UserCanBookAFlight() throws InterruptedException{
-		Runner.getDriver().get(APPLICATION_URL);
+		//Open the Emirates Flight Application
+		driver.get(APPLICATION_URL);
 		
-		String actualPageTitle = Runner.getDriver().getTitle();
+		//Verify Emirates Website is opened successfully
+		String actualPageTitle = driver.getTitle();
 		Assert.assertEquals( actualPageTitle,expectedPageTitle,"Application did not match the expected");
 		System.out.println("Application Opened successfully!");
 		
-		originTextBox = Runner.getDriver().findElement(By.xpath("//input[@id='flt_origin_text']"));
-		CustomWaits.waitforElement(Runner.getDriver(), originTextBox, 2);
-		originTextBox.sendKeys("St ");
-		String actualFromName = originTextBox.getAttribute("value");
-		Assert.assertTrue((actualFromName.contains(expectedFromCityName)) & (actualFromName.contains(expectedFromCountryName)), "Expected City or/and Country is not found.");
-		System.out.println("Selected " +expectedFromCityName+ " "+expectedFromCountryName+" in From field.");
+		//Click on Book a Flight button
+		driver.findElement(OR.lBookAFlight).click();
 		
-		destinationTextBox = Runner.getDriver().findElement(By.xpath("//input[@id='flt_destin_text']"));
-		CustomWaits.waitforElement(Runner.getDriver(), destinationTextBox, 2);
-		destinationTextBox.sendKeys("Sto");
-		String actualToName = destinationTextBox.getAttribute("value");
-		Assert.assertTrue((actualToName.contains(expectedToCityName))&(actualToName.contains(expectedToCountryName)),"Expcted City Name or/and Country Name is not found.");
-		System.out.println("Selected " +expectedToCityName+ " "+expectedToCountryName+" in To field.");
+		//select the Departure Airport
+		CustomWaits.waitforElement(driver, driver.findElement(OR.lDepartureAirport), 2);
+		driver.findElement(OR.lDepartureAirport).clear();
+		driver.findElement(OR.lDepartureAirport).sendKeys("St Petersburg");
+		driver.findElement(OR.lDepartureAirport).sendKeys(Keys.ENTER);
+		System.out.println("clicked Enter");
+		String actualFromName = driver.findElement(OR.lDepartureAirport).getAttribute("value");
+		Assert.assertEquals(actualFromName, expectedFromCityName, "Expected City is not found.");
+		System.out.println("Selected " +expectedFromCityName+" in From field.");
 		
-		CustomActions.pickDate("departuredate", departureDate);
+		//select the Arrival Airport
+		CustomWaits.waitforElement(driver, driver.findElement(OR.lArrivalAirport), 2);
+		driver.findElement(OR.lArrivalAirport).clear();
+		driver.findElement(OR.lArrivalAirport).sendKeys("Dubai");
+		driver.findElement(OR.lArrivalAirport).sendKeys(Keys.ENTER);
+		String actualToName = driver.findElement(OR.lArrivalAirport).getAttribute("value");
+		Assert.assertEquals(actualToName, expectedToCityName,"Expcted City Name or/and Country Name is not found.");
+		System.out.println("Selected " +expectedToCityName+ " in To field.");
+		
+		//Select the departure Date
+		driver.findElement(OR.lDepartureDateCalendar).click();
+		CustomActions.pickDate(driver,departureDate);
 		System.out.println("Selected the Departure date as: "+departureDate);
-
-		CustomActions.pickDate("returnDate", returnDate);
+		
+		//select the return date
+		CustomActions.pickDate(driver,returnDate);
 		System.out.println("Selected the Return date as: "+returnDate);
 
-		
-		actualNoOfAdults = Runner.getDriver().findElement(By.xpath("//div[@id='fltHiddenFormPart']//div/label[contains(text(),'Adults')]/ancestor::div/div[@class='amout-line']//a[@role='button']")).getText();
+		//Verify the Number of Adults selected
+		actualNoOfAdults = driver.findElement(OR.lAdults).getText();
 		Assert.assertEquals(actualNoOfAdults, expectedNoOfAdults, "No of Adults is not matching.");
 		System.out.println("Verified Number of Adults selected is: "+expectedNoOfAdults);
+		Thread.sleep(2000);
 		
+		//Select the Number of children
+		driver.findElement(OR.lAddchildren).click();
+		driver.findElement(OR.lChildren).click();
+		driver.findElement(OR.lNoOfChildren).click();
+		Thread.sleep(2000);
 		
-		NoOfChildren = Runner.getDriver().findElement(By.xpath("//div[@id='fltHiddenFormPart']//div/label[contains(text(),'Children')]/ancestor::div/div[@class='amout-line']//div/div[@class='clicker  plus-amount-light']"));
-		CustomWaits.waitforElement(Runner.getDriver(), NoOfChildren, 2);
-		NoOfChildren.click();
-		
-		actualNoOfChildren = Runner.getDriver().findElement(By.xpath("//div[@id='fltHiddenFormPart']//div/label[contains(text(),'Children')]/ancestor::div/div[@class='amout-line']//a[@role='button']")).getText();
+		//verify the Number of children
+		actualNoOfChildren = driver.findElement(By.xpath("//a[@aria-label='Select the number of children aged between two and 11 years of age - 1  selected']//span")).getText();
 		Assert.assertEquals(actualNoOfChildren, expectedNoOfChildren, "No fo Children is not matching.");
 		System.out.println("Verified the Number of Children selected is: "+expectedNoOfChildren);
 		
-		Runner.getDriver().findElement(By.xpath("//div/button[@type='submit']/span[contains(text(),'Find flights & fares')]")).click();
-		Runner.getDriver().findElement(By.xpath("//h2[contains(text(),'Flights and ticket types')]")).getText();
+		//
+		driver.findElement(By.xpath("//div/button[@type='submit']/span[contains(text(),'Find flights & fares')]")).click();
+		driver.findElement(By.xpath("//h2[contains(text(),'Flights and ticket types')]")).getText();
 		Assert.assertEquals(searchResultsPageHeader, expectedsearchResultsPageHeader,"User clicked on Find Flights and Fare but, Search Results page is not Opened.");
 					
 	}

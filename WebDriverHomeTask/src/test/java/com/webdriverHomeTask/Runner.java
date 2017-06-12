@@ -8,7 +8,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 /*Create Driver Instance*/
 
 public class Runner {
-	public static WebDriver driver;
+	private static WebDriver driver;
 
 	public static WebDriver getDriver(){
 		if(driver==null){
