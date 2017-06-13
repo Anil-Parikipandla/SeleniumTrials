@@ -1,48 +1,42 @@
 package com.webdriverHomeTask;
 
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import com.webdriverHomeTask.CustomActions;
-import com.webdriverHomeTask.CustomWaits;
-import com.webdriverHomeTask.Runner;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 
 public class BookAFlightTest {
 	
 	private WebDriver driver;
 	private ObjectRepository OR;
-	private String APPLICATION_URL = "https://www.emirates.com/uk/english/";
-	private String expectedPageTitle = "Emirates flights – Book a flight, browse our flight offers and explore the Emirates Experience";
-	private String expectedFromCityName = "St Petersburg (LED)"; 
-	private String expectedToCityName = "Dubai (DXB)"; 
-	private String departureDate = "14.07.2017";
-	private String returnDate = "15.07.2017";
-	private String actualNoOfAdults = "";
-	private String expectedNoOfAdults = "1";
-	private String actualNoOfChildren = "";
-	private String expectedNoOfChildren = "1";
-	private String searchResultsPageHeader = "";
-	private String expectedsearchResultsPageHeader = "Flights and ticket types";
-	
-
-/*	WebElement bookAFlightlink =  driver.findElement(OR.lBookAFlight);
-	WebElement depatureAirportTextbox = driver.findElement(OR.lDepartureAirport);
-	WebElement arrivalAirportTextbox = driver.findElement(OR.lArrivalAirport);
-	WebElement adultsdropdown = driver.findElement(OR.lAdults);
-	WebElement addChildren = driver.findElement(OR.lAddchildren);
-	WebElement childrendropdown = driver.findElement(OR.lChildren);
-	WebElement NoOfChildren = driver.findElement(OR.lNoOfChildren);*/
-
+	private CustomActions CA;
+	private static final String APPLICATION_URL = "https://www.emirates.com/uk/english/";
+	private static final String expectedPageTitle = "Emirates flights – Book a flight, browse our flight offers and explore the Emirates Experience";
+	private static final String expectedFromCityName = "St Petersburg (LED)"; 
+	private static final String expectedToCityName = "Dubai (DXB)"; 
+	private static final String departureDate = "14.07.2017";
+	private static final String returnDate = "15.07.2017";
+	private static final String expectedNoOfAdults = "1";
+	private static final String expectedNoOfChildren = "1";
+	private static final String expectedsearchResultsPageHeader = "Make a booking";
+	private static final String expectedConnectionIn = "via DME";
+	private static String actualNoOfAdults = "";
+	private static String actualNoOfChildren = "";
+	private static String searchResultsPageHeader = "";
+	private static String expectedDepartingDate = "14 July 2017";
+	private static String expectedReturningDate = "15 July 2017";
 	
 	@BeforeClass
 	public void OpenBrowser(){
 		driver = Runner.getDriver();
 		OR = new ObjectRepository();
+		CA = new CustomActions();
 	}
 	
 	@Test
@@ -59,7 +53,7 @@ public class BookAFlightTest {
 		driver.findElement(OR.lBookAFlight).click();
 		
 		//select the Departure Airport
-		CustomWaits.waitforElement(driver, driver.findElement(OR.lDepartureAirport), 2);
+		CustomWaits.waitforElement(driver, "//input[@id='seldcity1-suggest']");
 		driver.findElement(OR.lDepartureAirport).clear();
 		driver.findElement(OR.lDepartureAirport).sendKeys("St Petersburg");
 		driver.findElement(OR.lDepartureAirport).sendKeys(Keys.ENTER);
@@ -69,8 +63,8 @@ public class BookAFlightTest {
 		System.out.println("Selected " +expectedFromCityName+" in From field.");
 		
 		//select the Arrival Airport
-		CustomWaits.waitforElement(driver, driver.findElement(OR.lArrivalAirport), 2);
-		driver.findElement(OR.lArrivalAirport).clear();
+		CustomWaits.waitforElement(driver, "//input[@id='selacity1-suggest']");
+		//driver.findElement(OR.lArrivalAirport).clear();
 		driver.findElement(OR.lArrivalAirport).sendKeys("Dubai");
 		driver.findElement(OR.lArrivalAirport).sendKeys(Keys.ENTER);
 		String actualToName = driver.findElement(OR.lArrivalAirport).getAttribute("value");
@@ -79,11 +73,11 @@ public class BookAFlightTest {
 		
 		//Select the departure Date
 		driver.findElement(OR.lDepartureDateCalendar).click();
-		CustomActions.pickDate(driver,departureDate);
+		CA.pickDate(driver,departureDate);
 		System.out.println("Selected the Departure date as: "+departureDate);
 		
 		//select the return date
-		CustomActions.pickDate(driver,returnDate);
+		CA.pickDate(driver,returnDate);
 		System.out.println("Selected the Return date as: "+returnDate);
 
 		//Verify the Number of Adults selected
@@ -93,6 +87,7 @@ public class BookAFlightTest {
 		Thread.sleep(2000);
 		
 		//Select the Number of children
+//		CustomWaits.waitforElement(driver, "//div[@id='navSecondary']//div/a[@class='add-teen-child-infant blue-outline-link add-childinfant-link add-child switchteenagerLink']");
 		driver.findElement(OR.lAddchildren).click();
 		driver.findElement(OR.lChildren).click();
 		driver.findElement(OR.lNoOfChildren).click();
@@ -103,11 +98,27 @@ public class BookAFlightTest {
 		Assert.assertEquals(actualNoOfChildren, expectedNoOfChildren, "No fo Children is not matching.");
 		System.out.println("Verified the Number of Children selected is: "+expectedNoOfChildren);
 		
-		//
-		driver.findElement(By.xpath("//div/button[@type='submit']/span[contains(text(),'Find flights & fares')]")).click();
-		driver.findElement(By.xpath("//h2[contains(text(),'Flights and ticket types')]")).getText();
+		//click on the Find flights button and verify search page is displayed successfully.
+		driver.findElement(OR.lFindFlights).click();
+		searchResultsPageHeader=driver.findElement(By.xpath("//h1[contains(text(),'Make a booking')]")).getText();
 		Assert.assertEquals(searchResultsPageHeader, expectedsearchResultsPageHeader,"User clicked on Find Flights and Fare but, Search Results page is not Opened.");
 					
+		//verify the different prices available for Outbound and Inbound
+		
+		
+		//verify the departing and returning dates
+		Assert.assertEquals(driver.findElement(OR.ldepartingdate).getText(),expectedDepartingDate,"Departure date is not matching with the provided departure date.");
+		Assert.assertEquals(driver.findElement(OR.lreturningDate).getText(), expectedReturningDate, "Returning date is not matching with the provided Return date.");
+		
+		//verify the flight has connection to moscow
+		System.out.println(driver.findElement(By.xpath("//*[@class='via-text']")).getText());
+		List<WebElement> listOfMoscowFlights = driver.findElements(By.xpath("//*[@class='via-text']"));
+		for(WebElement i : listOfMoscowFlights){
+			Assert.assertEquals(i.getText(), expectedConnectionIn, "Fligths connecting to moscow not found.");
+		}
+		
+		
+		
 	}
 
 }

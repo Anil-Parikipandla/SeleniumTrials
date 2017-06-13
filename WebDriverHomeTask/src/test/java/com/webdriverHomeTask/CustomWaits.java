@@ -1,16 +1,17 @@
 package com.webdriverHomeTask;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class CustomWaits {
 
-	public static void waitforElement(WebDriver driver, WebElement object,int Timeout ){
+	public static void waitforElement(WebDriver driver, String str ){
 		WebDriverWait wait = new WebDriverWait(driver, 10);
-		wait.until(ExpectedConditions.elementToBeClickable(object));
+		wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath(str))));
+		System.out.println("Element is clickable");
 	}
 	
 	public static void waitforElementTillDisplayed(WebDriver driver, WebElement object, String attribute, String value, int Timeout ){
@@ -18,9 +19,9 @@ public class CustomWaits {
 		wait.until(ExpectedConditions.attributeContains(object, attribute, value));
 	}
 	
-	public static void waitforStaleElement(WebDriver driver, WebElement object) throws InterruptedException{
+	public static void waitforStaleElement(WebDriver driver, String strXpath) throws InterruptedException{
 		WebDriverWait wait = new WebDriverWait(driver, 10);
-		wait.until(ExpectedConditions.not(ExpectedConditions.stalenessOf(object)));
+		wait.until(ExpectedConditions.not(ExpectedConditions.stalenessOf(driver.findElement(By.xpath(strXpath)))));
 		Thread.sleep(2000);
 	}
 
