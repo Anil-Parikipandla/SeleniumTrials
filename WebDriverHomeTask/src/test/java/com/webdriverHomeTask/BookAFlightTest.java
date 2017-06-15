@@ -1,5 +1,6 @@
 package com.webdriverHomeTask;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -7,7 +8,8 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 
@@ -31,13 +33,16 @@ public class BookAFlightTest {
 	private static String searchResultsPageHeader = "";
 	private static String expectedDepartingDate = "14 July 2017";
 	private static String expectedReturningDate = "15 July 2017";
+	private static ArrayList<String> FirstOutboudPrices = new ArrayList<String>();
+	private static ArrayList<String> FirstReturnPrices = new ArrayList<String>();
 	
-	@BeforeClass
+	@BeforeTest
 	public void OpenBrowser(){
 		driver = Runner.getDriver();
 		OR = new ObjectRepository();
 		CA = new CustomActions();
 	}
+	
 	
 	@Test
 	public void UserCanBookAFlight() throws InterruptedException{
@@ -84,14 +89,12 @@ public class BookAFlightTest {
 		actualNoOfAdults = driver.findElement(OR.lAdults).getText();
 		Assert.assertEquals(actualNoOfAdults, expectedNoOfAdults, "No of Adults is not matching.");
 		System.out.println("Verified Number of Adults selected is: "+expectedNoOfAdults);
-		Thread.sleep(2000);
 		
 		//Select the Number of children
 //		CustomWaits.waitforElement(driver, "//div[@id='navSecondary']//div/a[@class='add-teen-child-infant blue-outline-link add-childinfant-link add-child switchteenagerLink']");
 		driver.findElement(OR.lAddchildren).click();
 		driver.findElement(OR.lChildren).click();
 		driver.findElement(OR.lNoOfChildren).click();
-		Thread.sleep(2000);
 		
 		//verify the Number of children
 		actualNoOfChildren = driver.findElement(By.xpath("//a[@aria-label='Select the number of children aged between two and 11 years of age - 1  selected']//span")).getText();
@@ -104,21 +107,35 @@ public class BookAFlightTest {
 		Assert.assertEquals(searchResultsPageHeader, expectedsearchResultsPageHeader,"User clicked on Find Flights and Fare but, Search Results page is not Opened.");
 					
 		//verify the different prices available for Outbound and Inbound
+		List<WebElement> firstOutboundFlightPrices = driver.findElements(OR.lfirstOutboundFlight);
+		for(int i=0;i<firstOutboundFlightPrices.size();i++){
+			FirstOutboudPrices.add(firstOutboundFlightPrices.get(i).getText());
+		}
+		System.out.println("Various Prices Options for the first Outbound flight are: "+FirstOutboudPrices);
 		
+		List<WebElement> firstReturnFlightPrices = driver.findElements(OR.lfirstReturnFlight);
+		for(int i=0;i<firstReturnFlightPrices.size();i++){
+			FirstReturnPrices.add(firstReturnFlightPrices.get(i).getText());
+		}
+		System.out.println("Various Prices Options for the first Return flight are: "+FirstReturnPrices);
 		
 		//verify the departing and returning dates
-		Assert.assertEquals(driver.findElement(OR.ldepartingdate).getText(),expectedDepartingDate,"Departure date is not matching with the provided departure date.");
-		Assert.assertEquals(driver.findElement(OR.lreturningDate).getText(), expectedReturningDate, "Returning date is not matching with the provided Return date.");
+		Assert.assertEquals(driver.findElement(OR.ldepartingdate).getText().substring(10),expectedDepartingDate,"Departure date is not matching with the provided departure date.");
+		Assert.assertEquals(driver.findElement(OR.lreturningDate).getText().substring(10), expectedReturningDate, "Returning date is not matching with the provided Return date.");
 		
 		//verify the flight has connection to moscow
-		System.out.println(driver.findElement(By.xpath("//*[@class='via-text']")).getText());
 		List<WebElement> listOfMoscowFlights = driver.findElements(By.xpath("//*[@class='via-text']"));
+		String viaText = "";
 		for(WebElement i : listOfMoscowFlights){
-			Assert.assertEquals(i.getText(), expectedConnectionIn, "Fligths connecting to moscow not found.");
+			viaText = viaText+i.getText();
 		}
-		
-		
-		
+		Assert.assertTrue(viaText.contains(expectedConnectionIn), "Fligths connecting to moscow not found.");
+		System.out.println("Various Prices Options for the first Return flight are: "+FirstReturnPrices);
+	}
+	
+	@AfterTest
+	public void closeBrowser(){
+		Runner.closeDriver();
 	}
 
 }

@@ -22,7 +22,6 @@ public class CustomWaits {
 	public static void waitforStaleElement(WebDriver driver, String strXpath) throws InterruptedException{
 		WebDriverWait wait = new WebDriverWait(driver, 10);
 		wait.until(ExpectedConditions.not(ExpectedConditions.stalenessOf(driver.findElement(By.xpath(strXpath)))));
-		Thread.sleep(2000);
 	}
 
 }

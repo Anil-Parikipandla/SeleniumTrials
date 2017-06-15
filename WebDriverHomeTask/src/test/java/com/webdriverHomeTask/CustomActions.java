@@ -4,8 +4,16 @@ import java.text.DateFormatSymbols;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 public class CustomActions {
+	
+	public void preformMovetoElementandClick(WebDriver driver, WebElement element){
+		Actions actions = new Actions(driver);
+		actions.moveToElement(element).click().build();
+		actions.perform();
+	}
 
 	public void pickDate(WebDriver driver, String date) throws InterruptedException{
 
@@ -21,7 +29,7 @@ public class CustomActions {
 		
 		for(int i =0;i<=10;i++){
 			if(currentMonth.equalsIgnoreCase(month)){
-				CustomWaits.waitforStaleElement(driver,"//table[@class='ui-datepicker-calendar']//tbody[@id='dataLeft']//td/a[contains(text(),'"+day+"')]" );
+				CustomWaits.waitforStaleElement(driver,"//table[@class='ui-datepicker-calendar']//tbody[@id='dataLeft']//td/a[contains(text(),'"+day+"')]");
 				driver.findElement(By.xpath("//table[@class='ui-datepicker-calendar']//tbody[@id='dataLeft']//td/a[contains(text(),'"+day+"')]")).click();
 				System.out.println("selected Date is:"+day+"/"+currentMonth+"/" );
 				break;

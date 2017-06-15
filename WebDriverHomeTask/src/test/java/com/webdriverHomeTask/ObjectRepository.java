@@ -16,6 +16,8 @@ public class ObjectRepository {
 	private static final String findFlights = "//input[@id='btnStartBooking']";
 	private static final String departingDate = "//*[@id='resultSearchHolder']/table//*[normalize-space(text())='Departing']/..";
 	private static final String returningDate = "//*[@id='resultSearchHolder']/table//*[normalize-space(text())='Returning']/..";
+	private static final String firstOutboundFlight = "(//div[@id='ctl00_c_dvOBBResult']//*[@class='flight-fares-table-curr'])[1]//td//div[@class='price']/span[@class='curr-only']";
+	private static final String firstReturnFlight = "(//div[@id='ctl00_c_dvIBBResult']//*[@class='flight-fares-table-curr'])[1]//td//div[@class='price']/span[@class='curr-only']";
 	
 	
 	
@@ -33,6 +35,8 @@ public class ObjectRepository {
 	By lFindFlights = By.xpath(findFlights);
 	By ldepartingdate = By.xpath(departingDate);
 	By lreturningDate = By.xpath(returningDate);
+	By lfirstOutboundFlight = By.xpath(firstOutboundFlight);
+	By lfirstReturnFlight = By.xpath(firstReturnFlight);
 
 
 
